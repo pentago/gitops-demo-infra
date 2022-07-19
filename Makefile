@@ -19,7 +19,7 @@ cluster: clean ## Provisions single k3s cluster
 	@k3d cluster create                                                                  \
 		--servers 1                                                                      \
 		--api-port host.k3d.internal:6443                                                \
-		--image rancher/k3s:v1.23.5-k3s1                                                 \
+		--image rancher/k3s:v1.24.3-k3s1                                                 \
 		--token superSecretToken                                                         \
 		--timeout 60s                                                                    \
 		--port 443:443@loadbalancer:0                                                    \
@@ -46,7 +46,7 @@ multi-cluster: clean ## Create k3s multi-cluster setup, more info https://github
 		--servers 1                                                                      \
 		--api-port host.k3d.internal:64432                                               \
 		--network multicluster                                                           \
-		--image rancher/k3s:v1.23.5-k3s1                                                 \
+		--image rancher/k3s:v1.24.3-k3s1                                                 \
 		--token superSecretToken                                                         \
 		--timeout 60s                                                                    \
 		--port 4432:443@loadbalancer:0                                                   \
@@ -65,7 +65,7 @@ multi-cluster: clean ## Create k3s multi-cluster setup, more info https://github
 		--servers 1                                                                      \
 		--api-port host.k3d.internal:64433                                               \
 		--network multicluster                                                           \
-		--image rancher/k3s:v1.23.5-k3s1                                                 \
+		--image rancher/k3s:v1.24.3-k3s1                                                 \
 		--token superSecretToken                                                         \
 		--timeout 60s                                                                    \
 		--port 4433:443@loadbalancer:0                                                   \
@@ -84,7 +84,7 @@ multi-cluster: clean ## Create k3s multi-cluster setup, more info https://github
 		--servers 1                                                                      \
 		--api-port host.k3d.internal:64434                                               \
 		--network multicluster                                                           \
-		--image rancher/k3s:v1.23.5-k3s1                                                 \
+		--image rancher/k3s:v1.24.3-k3s1                                                 \
 		--token superSecretToken                                                         \
 		--timeout 60s                                                                    \
 		--port 4434:443@loadbalancer:0                                                   \
@@ -103,7 +103,7 @@ multi-cluster: clean ## Create k3s multi-cluster setup, more info https://github
 		--servers 1                                                                      \
 		--api-port host.k3d.internal:64431                                               \
 		--network multicluster                                                           \
-		--image rancher/k3s:v1.23.5-k3s1                                                 \
+		--image rancher/k3s:v1.24.3-k3s1                                                 \
 		--token superSecretToken                                                         \
 		--timeout 60s                                                                    \
 		--port 4431:443@loadbalancer:0                                                   \

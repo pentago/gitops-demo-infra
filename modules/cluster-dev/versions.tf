@@ -2,12 +2,12 @@ terraform {
   required_providers {
     local      = {
       source   = "hashicorp/local"
-      version  = "2.2.2"
+      version  = "2.2.3"
     }
 
     kubernetes = {
       source   = "hashicorp/kubernetes"
-      version  = "2.10.0"
+      version  = "2.12.1"
     }
 
     kubectl    = {
@@ -17,7 +17,7 @@ terraform {
 
     helm       = {
       source   = "hashicorp/helm"
-      version  = "2.5.1"
+      version  = "2.6.0"
     }
   }
 }

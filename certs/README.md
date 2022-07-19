@@ -21,7 +21,10 @@ authorityKeyIdentifier = keyid:always,issuer:always
 /usr/local/Cellar/openssl@3/3.0.2/bin/openssl req -x509 -new -nodes -key ca.key -sha256 -days 3650 -out ca.crt -extensions v3_ca -config openssl-with-ca.cnf
 ```
 
-* Double-click ca.crt and trust it site-wide in Keychain Access
+* Double-click ca.crt and trust it site-wide in Keychain Access or add via Keychain CLI:
+```
+sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ca.crt
+```
 
 * Create and apply cert-manager ClusterIssuer CA secret:
 ```

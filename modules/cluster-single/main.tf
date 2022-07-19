@@ -100,7 +100,7 @@ resource "null_resource" "connect_argocd" {
 
   provisioner "local-exec" {
     command = <<-EOF
-      argocd login argocd.gitops.local --grpc-web --username admin --password password
+      argocd login argocd.gitops.local --grpc-web --insecure --username admin --password password
       argocd cluster add --name single-cluster k3d-single --yes
       argocd app sync --async --force -l app=gitops-demo
       argocd app sync --async --force -l app=gitops-demo
