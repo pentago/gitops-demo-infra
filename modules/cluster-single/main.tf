@@ -30,15 +30,10 @@ resource "helm_release" "cert_manager" {
 }
 
 # apply cert-manager clusterissuer manifest
-data "kubectl_file_documents" "cert_manager_clusterissuer" {
-  content = file("./charts/cert-manager/issuer.yaml")
-}
-
 resource "kubectl_manifest" "cert_manager_clusterissuer" {
   depends_on         = [helm_release.cert_manager]
   override_namespace = "cert-manager"
-  count              = length(data.kubectl_file_documents.cert_manager_clusterissuer.documents)
-  yaml_body          = element(data.kubectl_file_documents.cert_manager_clusterissuer.documents, count.index)
+  yaml_body          = file("./charts/cert-manager/issuer.yaml")
 }
 
 # install ingress-nginx helm chart
@@ -49,6 +44,7 @@ resource "helm_release" "ingress_nginx" {
   name             = "ingress-nginx"
   namespace        = "ingress-nginx"
   create_namespace = true
+  timeout          = 120
   cleanup_on_fail  = true
   values = [
     file("./charts/ingress-nginx/values-cluster-single.yaml")
@@ -70,13 +66,13 @@ resource "helm_release" "argo_cd" {
   ]
 }
 
-  # login to ArgoCD instance and add cluster to it
+# login to ArgoCD instance and add cluster to it
 resource "null_resource" "connect_argocd" {
   depends_on         = [helm_release.argo_cd]
 
   provisioner "local-exec" {
     command = <<-EOF
-      argocd login argocd.gitops.local --grpc-web --insecure --username admin --password password
+      argocd login argocd.gitops.local --grpc-web --insecure --username admin --password password && \
       argocd cluster add --name single-cluster k3d-single --yes
     EOF
   }
@@ -94,25 +90,16 @@ resource "kubectl_manifest" "argocd_repos" {
   yaml_body          = file(element(data.kubectl_filename_list.argocd_repos.matches, count.index))
 }
 
-# apply argocd app manifests
-data "kubectl_filename_list" "argocd_apps" {
-  pattern = "./charts/argo-cd/single-cluster-apps/*.yaml"
-}
-
 resource "kubectl_manifest" "argocd_apps" {
   depends_on         = [kubectl_manifest.argocd_repos]
   override_namespace = "argocd"
-  count              = length(data.kubectl_filename_list.argocd_apps.matches)
-  yaml_body          = file(element(data.kubectl_filename_list.argocd_apps.matches, count.index))
+  yaml_body          = file("./charts/argo-cd/single-cluster-apps/applicationset.yaml")
 }
 
-  # sync ArgoCD apps
+# sync ArgoCD apps
 resource "null_resource" "sync_argocd" {
   depends_on         = [kubectl_manifest.argocd_apps]
-
   provisioner "local-exec" {
-    command = <<-EOF
-      argocd app sync --async --force -l app=gitops-demo
-    EOF
+    command = "argocd app sync --async --force -l app=gitops-demo"
   }
 }

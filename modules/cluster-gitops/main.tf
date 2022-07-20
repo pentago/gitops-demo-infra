@@ -30,15 +30,10 @@ resource "helm_release" "cert_manager" {
 }
 
 # apply cert-manager clusterissuer manifest
-data "kubectl_file_documents" "cert_manager_clusterissuer" {
-  content = file("./charts/cert-manager/issuer.yaml")
-}
-
 resource "kubectl_manifest" "cert_manager_clusterissuer" {
   depends_on         = [helm_release.cert_manager]
   override_namespace = "cert-manager"
-  count              = length(data.kubectl_file_documents.cert_manager_clusterissuer.documents)
-  yaml_body          = element(data.kubectl_file_documents.cert_manager_clusterissuer.documents, count.index)
+  yaml_body          = file("./charts/cert-manager/issuer.yaml")
 }
 
 # install ingress-nginx helm chart
@@ -49,6 +44,7 @@ resource "helm_release" "ingress_nginx" {
   name             = "ingress-nginx"
   namespace        = "ingress-nginx"
   create_namespace = true
+  timeout          = 120
   cleanup_on_fail  = true
   values = [
     file("./charts/ingress-nginx/values-cluster-gitops.yaml")
@@ -70,42 +66,42 @@ resource "helm_release" "argo_cd" {
   ]
 }
 
+# login to ArgoCD instance and add cluster to it
+resource "null_resource" "connect_argocd" {
+  depends_on         = [helm_release.argo_cd]
+
+  provisioner "local-exec" {
+    command = <<-EOF
+      argocd login argocd.gitops.local --grpc-web --insecure --username admin --password password && \
+      argocd cluster add --name dev-cluster k3d-dev --yes && \
+      argocd cluster add --name stage-cluster k3d-stage --yes && \
+      argocd cluster add --name prod-cluster k3d-prod --yes
+    EOF
+  }
+}
+
 # apply argocd git repo key manifests
 data "kubectl_filename_list" "argocd_repos" {
   pattern = "./charts/argo-cd/repos/*.yaml"
 }
 
 resource "kubectl_manifest" "argocd_repos" {
-  depends_on         = [helm_release.argo_cd]
+  depends_on         = [null_resource.connect_argocd]
   override_namespace = "argocd"
   count              = length(data.kubectl_filename_list.argocd_repos.matches)
   yaml_body          = file(element(data.kubectl_filename_list.argocd_repos.matches, count.index))
 }
 
-# apply argocd app manifests
-data "kubectl_filename_list" "argocd_apps" {
-  pattern = "./charts/argo-cd/multi-cluster-apps/*.yaml"
-}
-
 resource "kubectl_manifest" "argocd_apps" {
   depends_on         = [kubectl_manifest.argocd_repos]
   override_namespace = "argocd"
-  count              = length(data.kubectl_filename_list.argocd_apps.matches)
-  yaml_body          = file(element(data.kubectl_filename_list.argocd_apps.matches, count.index))
+  yaml_body          = file("./charts/argo-cd/multi-cluster-apps/applicationset.yaml")
 }
 
-  # login to ArgoCD instance, add cluster to it and sync ArgoCD apps
-resource "null_resource" "connect_argocd" {
+# sync ArgoCD apps
+resource "null_resource" "sync_argocd" {
   depends_on         = [kubectl_manifest.argocd_apps]
-
   provisioner "local-exec" {
-    command = <<-EOF
-      argocd login argocd.gitops.local:4431 --grpc-web --username admin --password password
-      argocd cluster add --name dev-cluster k3d-dev --yes
-      argocd cluster add --name stage-cluster k3d-stage --yes
-      argocd cluster add --name prod-cluster k3d-prod --yes
-      argocd app sync --async --force -l app=gitops-demo
-      argocd app sync --async --force -l app=gitops-demo
-    EOF
+    command = "argocd app sync --async --force -l app=gitops-demo"
   }
 }
