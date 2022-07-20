@@ -70,13 +70,25 @@ resource "helm_release" "argo_cd" {
   ]
 }
 
+  # login to ArgoCD instance and add cluster to it
+resource "null_resource" "connect_argocd" {
+  depends_on         = [helm_release.argo_cd]
+
+  provisioner "local-exec" {
+    command = <<-EOF
+      argocd login argocd.gitops.local --grpc-web --insecure --username admin --password password
+      argocd cluster add --name single-cluster k3d-single --yes
+    EOF
+  }
+}
+
 # apply argocd git repo key manifests
 data "kubectl_filename_list" "argocd_repos" {
   pattern = "./charts/argo-cd/repos/*.yaml"
 }
 
 resource "kubectl_manifest" "argocd_repos" {
-  depends_on         = [helm_release.argo_cd]
+  depends_on         = [null_resource.connect_argocd]
   override_namespace = "argocd"
   count              = length(data.kubectl_filename_list.argocd_repos.matches)
   yaml_body          = file(element(data.kubectl_filename_list.argocd_repos.matches, count.index))
@@ -94,15 +106,12 @@ resource "kubectl_manifest" "argocd_apps" {
   yaml_body          = file(element(data.kubectl_filename_list.argocd_apps.matches, count.index))
 }
 
-  # login to ArgoCD instance, add cluster to it and sync ArgoCD apps
-resource "null_resource" "connect_argocd" {
+  # sync ArgoCD apps
+resource "null_resource" "sync_argocd" {
   depends_on         = [kubectl_manifest.argocd_apps]
 
   provisioner "local-exec" {
     command = <<-EOF
-      argocd login argocd.gitops.local --grpc-web --insecure --username admin --password password
-      argocd cluster add --name single-cluster k3d-single --yes
-      argocd app sync --async --force -l app=gitops-demo
       argocd app sync --async --force -l app=gitops-demo
     EOF
   }
