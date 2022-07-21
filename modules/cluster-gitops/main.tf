@@ -72,10 +72,10 @@ resource "null_resource" "connect_argocd" {
 
   provisioner "local-exec" {
     command = <<-EOF
-      argocd login argocd.gitops.local --grpc-web --insecure --username admin --password password && \
-      argocd cluster add --name dev-cluster k3d-dev --yes && \
-      argocd cluster add --name stage-cluster k3d-stage --yes && \
-      argocd cluster add --name prod-cluster k3d-prod --yes
+      argocd login argocd.gitops.local:4431 --grpc-web --insecure --username admin --password password && \
+      argocd cluster add --name dev k3d-dev --yes && \
+      argocd cluster add --name stage k3d-stage --yes && \
+      argocd cluster add --name prod k3d-prod --yes
     EOF
   }
 }
