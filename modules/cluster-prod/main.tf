@@ -44,7 +44,6 @@ resource "helm_release" "ingress_nginx" {
   name             = "ingress-nginx"
   namespace        = "ingress-nginx"
   create_namespace = true
-  timeout          = 120
   cleanup_on_fail  = true
   values = [
     file("./charts/ingress-nginx/values-cluster-prod.yaml")

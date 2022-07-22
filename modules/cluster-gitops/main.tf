@@ -44,7 +44,6 @@ resource "helm_release" "ingress_nginx" {
   name             = "ingress-nginx"
   namespace        = "ingress-nginx"
   create_namespace = true
-  timeout          = 120
   cleanup_on_fail  = true
   values = [
     file("./charts/ingress-nginx/values-cluster-gitops.yaml")
@@ -58,7 +57,6 @@ resource "helm_release" "argo_cd" {
   chart           = "argo-cd"
   name            = "argocd"
   namespace       = "argocd"
-  timeout         = 120
   create_namespace = true
   cleanup_on_fail = true
   values = [
