@@ -95,11 +95,3 @@ resource "kubectl_manifest" "argocd_apps" {
   override_namespace = "argocd"
   yaml_body          = file("./charts/argo-cd/single-cluster-apps/applicationset.yaml")
 }
-
-# sync ArgoCD apps
-resource "null_resource" "sync_argocd" {
-  depends_on         = [kubectl_manifest.argocd_apps]
-  provisioner "local-exec" {
-    command = "argocd app sync --async --force -l app=gitops-demo"
-  }
-}
