@@ -96,4 +96,4 @@ resource "kubectl_manifest" "argocd_apps" {
   depends_on         = [kubectl_manifest.argocd_repos]
   override_namespace = "argocd"
   yaml_body          = file("./charts/argo-cd/multi-cluster-apps/applicationset.yaml")
-}s
+}
