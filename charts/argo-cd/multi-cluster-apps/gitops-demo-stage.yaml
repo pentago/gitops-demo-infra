@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitops-demo-stage
+  namespace: argocd
+  labels:
+    app: gitops-demo
+    env: stage
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    name: stage-cluster
+    namespace: gitops-demo-stage
+  source:
+    repoURL: https://github.com/pentago/gitops-demo-config.git
+    targetRevision: main
+    path: environment/stage
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - PruneLast=true

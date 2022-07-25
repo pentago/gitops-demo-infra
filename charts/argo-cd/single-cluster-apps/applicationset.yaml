@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: gitops-demo
+  namespace: argocd
+  labels:
+    app: gitops-demo
+spec:
+  generators:
+    - list:
+        elements:
+          - cluster: dev
+            url: https://host.k3d.internal:6443
+          - cluster: stage
+            url: https://host.k3d.internal:6443
+          - cluster: prod
+            url: https://host.k3d.internal:6443
+  template:
+    metadata:
+      name: "gitops-demo-{{cluster}}"
+      labels:
+        app: gitops-demo
+        env: "{{cluster}}"
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/pentago/gitops-demo-config.git
+        targetRevision: main
+        path: environment/{{cluster}}
+      destination:
+        server: "{{url}}"
+        namespace: "gitops-demo-{{cluster}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ApplyOutOfSyncOnly=true
+          - PruneLast=true

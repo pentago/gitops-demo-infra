@@ -1,0 +1,251 @@
+apiVersion: skaffold/v2beta29
+kind: Config
+profiles:
+- name: dev
+  activation:
+  - env: ARCH=amd64
+    command: dev
+  build:
+    artifacts:
+    - image: gitops-demo-backend
+      context: ../backend
+      docker:
+        dockerfile: Dockerfile
+        cliFlags:
+        - --platform
+        - linux/amd64
+    - image: gitops-demo-frontend
+      context: ../frontend
+      docker:
+        dockerfile: Dockerfile
+        cliFlags:
+        - --platform
+        - linux/amd64
+    local:
+      push: false
+      useDockerCLI: true
+      useBuildkit: true
+      concurrency: 0
+  deploy:
+    kustomize:
+      paths:
+      - ../config/environment/local
+      buildArgs:
+      - --load-restrictor LoadRestrictionsNone
+- name: development
+  activation:
+  - env: ARCH=amd64
+    command: development
+  build:
+    artifacts:
+    - image: gitops-demo-backend
+      context: ../backend
+      docker:
+        dockerfile: Dockerfile
+        cliFlags:
+        - --platform
+        - linux/amd64
+    - image: gitops-demo-frontend
+      context: ../frontend
+      docker:
+        dockerfile: Dockerfile
+        cliFlags:
+        - --platform
+        - linux/amd64
+    local:
+      push: false
+      useDockerCLI: true
+      useBuildkit: true
+      concurrency: 0
+  deploy:
+    kustomize:
+      paths:
+      - ../config/environment/dev
+      buildArgs:
+      - --load-restrictor LoadRestrictionsNone
+- name: staging
+  activation:
+  - env: ARCH=amd64
+    command: staging
+  build:
+    artifacts:
+    - image: gitops-demo-backend
+      context: ../backend
+      docker:
+        dockerfile: Dockerfile
+        cliFlags:
+        - --platform
+        - linux/amd64
+    - image: gitops-demo-frontend
+      context: ../frontend
+      docker:
+        dockerfile: Dockerfile
+        cliFlags:
+        - --platform
+        - linux/amd64
+    local:
+      push: false
+      useDockerCLI: true
+      useBuildkit: true
+      concurrency: 0
+  deploy:
+    kustomize:
+      paths:
+      - ../config/environment/stage
+      buildArgs:
+      - --load-restrictor LoadRestrictionsNone
+- name: production
+  activation:
+  - env: ARCH=amd64
+    command: production
+  build:
+    artifacts:
+    - image: gitops-demo-backend
+      context: ../backend
+      docker:
+        dockerfile: Dockerfile
+        cliFlags:
+        - --platform
+        - linux/amd64
+    - image: gitops-demo-frontend
+      context: ../frontend
+      docker:
+        dockerfile: Dockerfile
+        cliFlags:
+        - --platform
+        - linux/amd64
+    local:
+      push: false
+      useDockerCLI: true
+      useBuildkit: true
+      concurrency: 0
+  deploy:
+    kustomize:
+      paths:
+      - ../config/environment/prod
+      buildArgs:
+      - --load-restrictor LoadRestrictionsNone
+- name: dev-arm
+  activation:
+  - env: ARCH=arm64
+    command: dev
+  build:
+    artifacts:
+    - image: gitops-demo-backend
+      context: ../backend
+      docker:
+        dockerfile: Dockerfile
+        cliFlags:
+        - --platform
+        - linux/arm64
+    - image: gitops-demo-frontend
+      context: ../frontend
+      docker:
+        dockerfile: Dockerfile
+        cliFlags:
+        - --platform
+        - linux/arm64
+    local:
+      push: false
+      useDockerCLI: true
+      useBuildkit: true
+      concurrency: 0
+  deploy:
+    kustomize:
+      paths:
+      - ../config/environment/local
+      buildArgs:
+      - --load-restrictor LoadRestrictionsNone
+- name: development-arm
+  activation:
+  - env: ARCH=arm64
+    command: development
+  build:
+    artifacts:
+    - image: gitops-demo-backend
+      context: ../backend
+      docker:
+        dockerfile: Dockerfile
+        cliFlags:
+        - --platform
+        - linux/arm64
+    - image: gitops-demo-frontend
+      context: ../frontend
+      docker:
+        dockerfile: Dockerfile
+        cliFlags:
+        - --platform
+        - linux/arm64
+    local:
+      push: false
+      useDockerCLI: true
+      useBuildkit: true
+      concurrency: 0
+  deploy:
+    kustomize:
+      paths:
+      - ../config/environment/dev
+      buildArgs:
+      - --load-restrictor LoadRestrictionsNone
+- name: staging-arm
+  activation:
+  - env: ARCH=arm64
+    command: staging
+  build:
+    artifacts:
+    - image: gitops-demo-backend
+      context: ../backend
+      docker:
+        dockerfile: Dockerfile
+        cliFlags:
+        - --platform
+        - linux/arm64
+    - image: gitops-demo-frontend
+      context: ../frontend
+      docker:
+        dockerfile: Dockerfile
+        cliFlags:
+        - --platform
+        - linux/arm64
+    local:
+      push: false
+      useDockerCLI: true
+      useBuildkit: true
+      concurrency: 0
+  deploy:
+    kustomize:
+      paths:
+      - ../config/environment/stage
+      buildArgs:
+      - --load-restrictor LoadRestrictionsNone
+- name: production-arm
+  activation:
+  - env: ARCH=arm64
+    command: production
+  build:
+    artifacts:
+    - image: gitops-demo-backend
+      context: ../backend
+      docker:
+        dockerfile: Dockerfile
+        cliFlags:
+        - --platform
+        - linux/arm64
+    - image: gitops-demo-frontend
+      context: ../frontend
+      docker:
+        dockerfile: Dockerfile
+        cliFlags:
+        - --platform
+        - linux/arm64
+    local:
+      push: false
+      useDockerCLI: true
+      useBuildkit: true
+      concurrency: 0
+  deploy:
+    kustomize:
+      paths:
+      - ../config/environment/prod
+      buildArgs:
+      - --load-restrictor LoadRestrictionsNone

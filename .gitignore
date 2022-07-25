@@ -1,0 +1,7 @@
+creds/
+certs/ca.crt
+certs/ca.key
+certs/ca-secret.yaml
+.terraform*
+*tfstate*
+.DS_Store
