@@ -227,8 +227,7 @@ injector:
   # extraEnvironmentVars is a list of extra environment variables to set in the
   # injector deployment.
   extraEnvironmentVars:
-    {}
-    # KUBERNETES_SERVICE_HOST: kubernetes.default.svc
+    KUBERNETES_SERVICE_HOST: kubernetes.default.svc
 
   # Affinity Settings for injector pods
   # This can either be multi-line string or YAML matching the PodSpec's affinity field.
@@ -454,7 +453,7 @@ server:
   readinessProbe:
     enabled: true
     # If you need to use a http path instead of the default exec
-    # path: /v1/sys/health?standbyok=true
+    path: /v1/sys/health?standbyok=true
 
     # When a probe fails, Kubernetes will try failureThreshold times before giving up
     failureThreshold: 2
@@ -606,7 +605,7 @@ server:
 
     # Configures the service type for the main Vault service.  Can be ClusterIP
     # or NodePort.
-    #type: ClusterIP
+    type: ClusterIP
 
     # Do not wait for pods to be ready
     publishNotReadyAddresses: true
@@ -750,9 +749,9 @@ server:
     # The Vault cluster will coordinate leader elections and failovers internally.
     raft:
       # Enables Raft integrated storage
-      enabled: false
+      enabled: true
       # Set the Node Raft ID to the name of the pod
-      setNodeId: false
+      setNodeId: true
 
       # Note: Configuration files are stored in ConfigMaps so sensitive data
       # such as passwords should be either mounted through extraSecretEnvironmentVars
@@ -879,7 +878,7 @@ csi:
   # With the driver and provider installed, you can mount Vault secrets into volumes
   # similar to the Vault Agent injector, and you can also sync those secrets into
   # Kubernetes secrets.
-  enabled: false
+  enabled: true
 
   image:
     repository: 'hashicorp/vault-csi-provider'
