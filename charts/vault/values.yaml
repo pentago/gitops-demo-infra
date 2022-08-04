@@ -65,7 +65,7 @@ injector:
   # required.
   agentImage:
     repository: 'hashicorp/vault'
-    tag: '1.11.1'
+    tag: '1.11.2'
 
   # The default values for the injected Vault Agent containers.
   agentDefaults:
@@ -227,7 +227,8 @@ injector:
   # extraEnvironmentVars is a list of extra environment variables to set in the
   # injector deployment.
   extraEnvironmentVars:
-    KUBERNETES_SERVICE_HOST: kubernetes.default.svc
+    {}
+    # KUBERNETES_SERVICE_HOST: kubernetes.default.svc
 
   # Affinity Settings for injector pods
   # This can either be multi-line string or YAML matching the PodSpec's affinity field.
@@ -325,7 +326,7 @@ server:
 
   image:
     repository: 'hashicorp/vault'
-    tag: '1.11.1'
+    tag: '1.11.2'
     # Overrides the default Image Pull Policy
     pullPolicy: IfNotPresent
 
@@ -453,7 +454,7 @@ server:
   readinessProbe:
     enabled: true
     # If you need to use a http path instead of the default exec
-    path: /v1/sys/health?standbyok=true
+    # path: /v1/sys/health?standbyok=true
 
     # When a probe fails, Kubernetes will try failureThreshold times before giving up
     failureThreshold: 2
@@ -986,4 +987,5 @@ csi:
   # Pass arbitrary additional arguments to vault-csi-provider.
   # See https://www.vaultproject.io/docs/platform/k8s/csi/configurations#command-line-arguments
   # for the available command line flags.
-  extraArgs: []
+  extraArgs:
+    - -vault-namespace=vault
